@@ -17,10 +17,11 @@ public class Mario : MonoBehaviour
     public float runAcceleration;
     public eDirection direction;
     public bool running;
-   
-    
-    [Header("Jumping")]
+    public bool blockedRight;
+    public bool blockedLeft;
+    public float wallDetectBuffer;
 
+    [Header("Jumping")]
     private float jumpMultiplier;
     public float jumpSpeed;
     public float unJumpSpeed;
@@ -28,13 +29,15 @@ public class Mario : MonoBehaviour
     public float groundDetectBuffer;
     public float minJumpMulti;
     public float maxJumpMulti;
-    public float maxAirSpeed;
-    public float airSpeed;
-    public bool airSpeedSet;
+
+    [Header("Other Stuff")]
+    public bool crouching;
+    private Vector2 ogOffset;
+    private Vector2 ogSize;
+    private Vector2 crouchOffset = new Vector2(0f, -0.5f);
+    private Vector2 crouchedSize = new Vector2(1, 1);
 
     [Header("Animation")]
-
-    public bool crouching;
     public float skidThreshold;
 
     [Header("Components")]
@@ -49,24 +52,36 @@ public class Mario : MonoBehaviour
     {
         body = gameObject.GetComponent<Rigidbody2D>();
         myCollider = gameObject.GetComponent<BoxCollider2D>();
+
+        ogOffset = myCollider.offset;
+        ogSize = myCollider.size;
     }
 
     // Update is called once per frame
     void Update()
     {
         grounded = Physics2D.BoxCast(myCollider.bounds.center, myCollider.bounds.size, 0, Vector2.down, groundDetectBuffer, 1 << 8);
+        blockedLeft = Physics2D.BoxCast(myCollider.bounds.center, myCollider.bounds.size, 0, Vector2.left, wallDetectBuffer, 1 << 8);
+        blockedRight = Physics2D.BoxCast(myCollider.bounds.center, myCollider.bounds.size, 0, Vector2.right, wallDetectBuffer, 1 << 8);
 
-
-        /* if (!grounded&&!airSpeedSet)
-         {
-             maxAirSpeed = Mathf.Abs(currentSpeed);
-             airSpeedSet = true;
-         }
-
-         if (grounded)
-         {
-             airSpeedSet = false;
-         }*/
+        if (blockedLeft)
+        {
+            currentSpeed = Mathf.Clamp(currentSpeed, 0, currentMaxSpeed);
+        }
+        if (blockedRight)
+        {
+            currentSpeed = Mathf.Clamp(currentSpeed, -currentMaxSpeed, 0);
+        }
+        if (crouching)
+        {
+            myCollider.offset = crouchOffset;
+            myCollider.size = crouchedSize;
+        }
+        else
+        {
+            myCollider.offset = ogOffset;
+            myCollider.size = ogSize;
+        }
 
         InputManager();
         if (running)
@@ -81,34 +96,19 @@ public class Mario : MonoBehaviour
         }
         if (direction == eDirection.right)
         {
-          //  if (grounded)
-          //  {
+
                 currentSpeed += acceleration * Time.deltaTime;
-          //   }
-          //  else
-          //  {
-          //       airSpeed += acceleration * Time.deltaTime;
-          //  }
+
         }
         if (direction == eDirection.left) 
         { 
- //         if (grounded)
- //          {
+
             currentSpeed -= acceleration * Time.deltaTime;
- //          }
- //         else
- //           {
- //            airSpeed -= acceleration * Time.deltaTime;
- //           }
+
         }
         currentSpeed = Mathf.MoveTowards(currentSpeed, 0, damping * Time.deltaTime);
 
         currentSpeed = Mathf.Clamp(currentSpeed, -currentMaxSpeed, currentMaxSpeed);
-
-       // airSpeed = Mathf.Clamp(airSpeed, -maxAirSpeed, maxAirSpeed);
-
-       // Vector2 airMovement = new Vector2(airSpeed, 0);
-       // transform.Translate(airMovement * Time.deltaTime);
 
         Vector2 movement = new Vector2(currentSpeed, 0);
         transform.Translate(movement * Time.deltaTime);
@@ -163,7 +163,7 @@ public class Mario : MonoBehaviour
     void InputManager()
     {
         direction = eDirection.idle;
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A)&&!blockedLeft)
         {
             if (!crouching)
             {
@@ -190,7 +190,7 @@ public class Mario : MonoBehaviour
             }
         }
     
-        if (Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.D)&&!blockedRight)
         {
             if (!crouching)
             {
@@ -227,6 +227,7 @@ public class Mario : MonoBehaviour
 
         if (Input.GetKey(KeyCode.S)&& grounded)
         {
+            
             animator.SetBool("isCrouching", true);
             crouching = true;
         }

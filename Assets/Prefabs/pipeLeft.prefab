@@ -89,7 +89,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2842313864975538165}
   - component: {fileID: 1246962191832626471}
-  - component: {fileID: 61238313019770374}
+  - component: {fileID: 61328129095136464}
   m_Layer: 8
   m_Name: pipeLeft
   m_TagString: Untagged
@@ -160,7 +160,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &61238313019770374
+--- !u!61 &61328129095136464
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -169,11 +169,11 @@ BoxCollider2D:
   m_GameObject: {fileID: 9054868714276256724}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 9d8be672e5ffca74bbba64c53ea097c7, type: 2}
+  m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.4941435, y: 0}
+  m_Offset: {x: 0.50105095, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -184,5 +184,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.9518108, y: 1}
+  m_Size: {x: 2.002102, y: 1}
   m_EdgeRadius: 0
